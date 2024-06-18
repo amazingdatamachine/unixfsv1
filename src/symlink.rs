@@ -47,12 +47,12 @@ mod tests {
         // `foo_directory/b`.
         serialize_symlink_block("b", &mut buf);
 
-        let mh = Code::Sha2_256.digest(&buf);
+        let mh = Code::Blake3_256.digest(&buf);
         let cid = Cid::new_v1(DAG_PB, mh);
 
         assert_eq!(
             cid.to_string(),
-            "bafybeih4p6wgtxnujy4wq3wp2hwmnrjkwzj7iit6km7oosroeohywikd2m"
+            "bafyb4iak4lbydllkk5fdmldcsratygbczflh5l4huuqhgyovvznrf5gnpy"
         );
     }
 
@@ -80,7 +80,7 @@ mod tests {
 
         assert_eq!(
             otn.cid.to_string(),
-            "bafybeibsalmqatls4cakc5ivjn3yawtb66h5ztg33w2us7oomnlt2ugzgu"
+            "bafyb4ienucpfitv32qer4sj5hvyggyczh3lazgguwoc5ly75fhpetgpjqi"
         );
     }
 
@@ -113,7 +113,7 @@ mod tests {
 
         assert_eq!(
             otn.cid.to_string(),
-            "bafybeibsalmqatls4cakc5ivjn3yawtb66h5ztg33w2us7oomnlt2ugzgu"
+            "bafyb4ienucpfitv32qer4sj5hvyggyczh3lazgguwoc5ly75fhpetgpjqi"
         );
     }
 

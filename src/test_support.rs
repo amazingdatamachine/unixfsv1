@@ -50,6 +50,19 @@ impl FakeBlockstore {
         cid
     }
 
+    pub fn insert_v1(&mut self, block: &[u8]) -> Cid {
+        let mh = Code::Blake3_256.digest(block);
+        let cid = Cid::new_v1(0x70, mh);
+
+        assert!(
+            self.blocks.insert(cid, block.to_vec()).is_none(),
+            "duplicate cid {}",
+            cid
+        );
+
+        cid
+    }
+
     pub fn with_fixtures() -> Self {
         let mut this = Self::default();
         let foobar_blocks: &[&[u8]] = &[

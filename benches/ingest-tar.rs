@@ -52,7 +52,7 @@ fn ingest_tar(bytes: &[u8], buffer: &mut Vec<u8>, path: &mut String) {
 
             let len = buffer.len();
 
-            let mh = Code::Sha2_256.digest(buffer);
+            let mh = Code::Blake3_256.digest(buffer);
             let cid = Cid::new_v1(0x70, mh);
 
             tree.put_link(path, cid, len as u64).unwrap();

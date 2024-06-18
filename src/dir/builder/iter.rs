@@ -143,7 +143,7 @@ impl PostOrderIterator {
 
         buffer.truncate(size);
 
-        let mh = Code::Sha2_256.digest(buffer);
+        let mh = Code::Blake3_256.digest(buffer);
         let cid = Cid::new_v1(DAG_PB, mh);
 
         let combined_from_links = links

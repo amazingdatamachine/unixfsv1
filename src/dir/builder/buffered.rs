@@ -221,27 +221,27 @@ mod tests {
         let expected = vec![
             (
                 "a/b/c/d/e/f",
-                "bafybeiggi7xxndgcvvn776odlzbyo42os3m2ns7flmd2zoqjdtxhxjj5pm",
+                "bafyb4ieg4qdtzgmvtr3khnwoahjxcpcue5gadawf4y47vkwpxhaov6eidm",
             ),
             (
                 "a/b/c/d/e",
-                "bafybeienpcl75unpkin7sublc6b4liop2efhscxxlxgipncfvnxydsu6ya",
+                "bafyb4iekom4dsn37tzdeeylrfei632psi6cqchqwnnemk2657sycdf6bkm",
             ),
             (
                 "a/b/c/d",
-                "bafybeigwwu5zfiu7trjhnulcejlpo7ytinr4iyqasetnmw3sko5l36wjqm",
+                "bafyb4iaz6r5xlfgi5ueaetgah7ok2vzvn7plhnk6c5ipilxsronbgfsjtq",
             ),
             (
                 "a/b/c",
-                "bafybeig7jp4rbhaejauys6drkl66c7gcsp26gn3hdryezex5j4jng4ppda",
+                "bafyb4iapgxvdln6jhydsszvlkcu6zugtrae7afbeen4jmhnxjbd524mm4y",
             ),
             (
                 "a/b",
-                "bafybeiethbkivdfv6yvvl4ho4tv2ogbyn4uzblvtkjuqksu2acbk32gwf4",
+                "bafyb4id4d5jzbgrl646znsf4t7epuvrhxa3ttnslwi4cc2jowf4o34pcgu",
             ),
             (
                 "a",
-                "bafybeiaadgmref7r6eqwxv66nmwfoy3qxv57gdwmk4xnierff5bobsvsny",
+                "bafyb4igtz4c6sni3sltktyvu6yv6zatdzub3g3vw2lzv7cipytpl743yjq",
             ),
         ];
 
@@ -301,7 +301,7 @@ mod tests {
             actual,
             &[(
                 "".to_string(),
-                "bafybeihcvyze4cpjen52osvvcqyhlgtbe456g6lyudqa37tcbctkl4x6kq".to_string()
+                "bafyb4ifpdhavygnqotodsguoqqx6znag6afxc64jtqov3xvix7kdm65rwi".to_string()
             )]
         );
     }
@@ -327,7 +327,7 @@ mod tests {
             actual,
             &[(
                 "".to_string(),
-                "bafybeia3o7eaqkxuxpdotmu5su3rmdvmuimpo7vpb23ulpzg7od7j3nlte".to_string()
+                "bafyb4ifyk6qjia6ovmmi2dm6rbnl6msc7f6hqarvknxtl3x24k5mcceare".to_string()
             )]
         );
     }
@@ -391,9 +391,9 @@ mod tests {
 
     #[test]
     fn dir_with_cidv1_link() {
-        // this is `echo '{ "name": "hello" }` | ./ipfs dag put`
+        // this is `echo '{ "name": "hello" }` | ./ipfs dag put --hash blake3`
         let target =
-            Cid::try_from("bafyreihakpd7te5nbmlhdk5ntvcvhf2hmfgrvcwna2sddq5zz5342mcbli").unwrap();
+            Cid::try_from("bafyr4ifin44ytgf7dquz2ezv42o4vemxiuapblam4vdfpdbnfv6b73a5vm").unwrap();
 
         let mut builder = BufferingTreeBuilder::default();
         builder.put_link("a/b", target, 12).unwrap();
@@ -406,7 +406,7 @@ mod tests {
 
         let expected = vec![(
             "a",
-            "bafybeiapacmj5oggpmkv7c4d2ujfokpdmnczg2gtr5ddumhz7j4sdy7734",
+            "bafyb4ievl5nahthklm2id2disyfbfgxdpqvd5x7csnzi4eo4u75cgfxzcm",
         )];
 
         verify_results(expected, actual);
@@ -454,7 +454,7 @@ mod tests {
 
     /// Returns a quick and dirty sha2-256 of the given number as a Cidv0
     fn some_cid(number: usize) -> Cid {
-        let mh = Code::Sha2_256.digest(&number.to_le_bytes());
+        let mh = Code::Blake3_256.digest(&number.to_le_bytes());
         Cid::new_v1(DAG_PB, mh)
     }
 }

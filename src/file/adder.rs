@@ -313,7 +313,7 @@ fn render_and_hash(flat: &FlatUnixFs<'_>) -> (Cid, Vec<u8>) {
     let mut writer = Writer::new(&mut out);
     flat.write_message(&mut writer)
         .expect("unsure how this could fail");
-    let mh = Code::Sha2_256.digest(&out);
+    let mh = Code::Blake3_256.digest(&out);
     let cid = Cid::new_v1(DAG_PB, mh);
     (cid, out)
 }
@@ -695,28 +695,40 @@ mod tests {
 
     #[test]
     fn favourite_multi_block_file() {
-        // root should be QmRJHYTNvC3hmd9gJQARxLR1QMEincccBV53bBw524yyq6
+        let mut blockstore = FakeBlockstore::default();
+        let root_block = &hex!("122a0a2401701e206144fcc304691cf114a751aaaafccaabaa86da07f34e428563195cceed63e9571200180a122a0a2401701e20aff00e069580d22e925276d1cd8191e029bd0c31bca556dc50f4d6d471cff2ef1200180a122a0a2401701e20e26516401957885dfff13a7f87ef2e998ec39a3bd206f0ac9b086a11280e11761200180a122a0a2401701e20c3854e01a309beac0ea953d397ebed3a506c2e4b82689bf0704673b6756869f6120018090a0c080218072002200220022001");
+        // first bytes: fo
+        let block_1 = &hex!("0a0808021202666f1802");
+        // ob
+        let block_2 = &hex!("0a08080212026f621802");
+        // ar
+        let block_3 = &hex!("0a080802120261721802");
+        // \n
+        let block_4 = &hex!("0a07080212010a1801");
+        blockstore.insert_v1(root_block);
+        blockstore.insert_v1(block_1);
+        blockstore.insert_v1(block_2);
+        blockstore.insert_v1(block_3);
+        blockstore.insert_v1(block_4);
 
-        let blocks = FakeBlockstore::with_fixtures();
         let content = b"foobar\n";
         let adder = FileAdder::builder().with_chunker(Chunker::Size(2)).build();
-
         let blocks_received = adder.collect_blocks(content, 0);
 
         // the order here is "fo", "ob", "ar", "\n", root block
         // while verifying the root Cid would be *enough* this is easier to eyeball, ... not really
         // that much but ...
         let expected = [
-            "bafybeih67h7bqbeufm26dhqulib7tsovzkojs7o2bkkbn47vcwss6gz44e",
-            "bafybeig7xffxllfsbd6uq46yjbzk6wf5mxdtc5ykpvga33vubchiooil7y",
-            "bafybeiafisl24tujqewigj3kjdr6m6ibhj4iw7aowatrfxyvbfoafvwnfq",
-            "bafybeigmgmwown66u7j5pqancojrc5ry2pwzmnlvqnwg2rfcjfi6irgplu",
-            "bafybeicbvfcf3ys43v7u4obvdypbdzdsddiqvagpwldjvlj7kyrkwkpm3u",
+            "bafyb4idbit6mgbdjdtyrjj2rvkvpzsvlvkdnub7tjzbikyyzltho2y7jk4",
+            "bafyb4ifp6ahanfma2ixjeutw2hgydepafg6qymn4uvlnyuhu23khdt7s54",
+            "bafyb4ihcmuleagkxrbo774j2p6d66luzr3bzuo6sa3ykzgyiniisqdqroy",
+            "bafyb4igdqvhadiyjx2wa5kkt2ol6x3j2kbwc4s4cncn7a4cgoo3hk2dj6y",
+            "bafyb4ib23nu6s2fdmnf5zafrb54jrczjokxpvop5fcaeodqgkzhk4ranya",
         ]
         .iter()
         .map(|key| {
             let cid = Cid::try_from(*key).unwrap();
-            let block = blocks.get_by_str(key).to_vec();
+            let block = blockstore.get_by_str(key).to_vec();
             (cid, block)
         })
         .collect::<Vec<_>>();
@@ -757,7 +769,7 @@ mod tests {
 
         assert_eq!(
             blocks_received.last().unwrap().0.to_string(),
-            "bafybeiedgegddvmfxlnikgwgxet6am5xkrhforeqb6wxyga3p7jmmge27u"
+            "bafyb4iaizgts2csy4bdkvuf7exxgiktevl56xq5m5jdhndx3id3vygn5z4"
         );
     }
 
@@ -772,7 +784,7 @@ mod tests {
             let blocks_received = adder.collect_blocks(content, amt);
             assert_eq!(
                 blocks_received.last().unwrap().0.to_string(),
-                "bafybeiedxvsh3dwkublmenfbir3li4jf52opwcf5dgpi62h6yv4gd7klku",
+                "bafyb4ib7f75aaiynxm37hwxxd3jdadtxaqvidgpgeybn3xoqe4wkpmtbaq",
                 "amt: {}",
                 amt
             );
@@ -792,7 +804,7 @@ mod tests {
         assert_eq!(blocks[0].1.as_slice(), &hex!("0a 04 08 02 18 00"));
         assert_eq!(
             blocks[0].0.to_string(),
-            "bafybeif7ztnhq65lumvvtr4ekcwd2ifwgm3awq4zfr3srh462rwyinlb4y"
+            "bafyb4icvwknbzf4e6xryxlucewpmolohxpxn6kzveuc24mpae2ytsacb4y"
         );
     }
 
@@ -838,7 +850,7 @@ mod tests {
 
         assert_eq!(
             last_blocks.last().unwrap().0.to_string(),
-            "bafybeiai6dvlhomgaargeb677jd7bugp7pscqeakbvtapdlpvsfuedojqa"
+            "bafyb4ia4wpgrjgtzofqwufxzwkbqi2tmp4f2vydsmdbabjzw42hfdi4ih4"
         );
     }
 
@@ -872,7 +884,7 @@ mod tests {
 
         assert_eq!(
             last_block.0.to_string(),
-            "bafybeihkyby6yehjk25b3havpq4jxsfqxf54jizpjqodovxiuwav62uzpy"
+            "bafyb4icxrifnwglwsod532lwt7scbkuzgukzxrg5mvfq6nbh2dwyatxj54"
         );
 
         assert_eq!(blocks_count, 175);
